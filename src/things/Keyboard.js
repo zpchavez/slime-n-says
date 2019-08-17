@@ -4,6 +4,21 @@ import BlackKey from './BlackKey';
 
 const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 const sharps = ['C', 'D', 'F', 'G', 'A'];
+const controlMap = {
+  C4: 'A',
+  Cs4: 'W',
+  D4: 'S',
+  Ds4: 'E',
+  E4: 'D',
+  F4: 'F',
+  Fs4: 'T',
+  G4: 'G',
+  Gs4: 'Y',
+  A4: 'H',
+  As4: 'U',
+  B4: 'J',
+  C5: 'K'
+};
 
 class Keyboard
 {
@@ -32,12 +47,14 @@ class Keyboard
   drawKeys() {
     this.keys = {};
 
-    notes.forEach((note, i) => {
-      this.keys[`${note}4`] = new WhiteKey(this.g, i);
+    notes.forEach((n, i) => {
+      const note = `${n}4`
+      this.keys[note] = new WhiteKey(this.g, i, controlMap[note]);
     })
-    this.keys[`C5`] = new WhiteKey(this.g, 7);
-    sharps.forEach((note, i) => {
-      this.keys[`${note}s4`] = new BlackKey(this.g, i);
+    this.keys[`C5`] = new WhiteKey(this.g, 7, controlMap['C5']);
+    sharps.forEach((n, i) => {
+      const note = `${n}s4`;
+      this.keys[note] = new BlackKey(this.g, i, controlMap[note]);
     })
   }
 }
