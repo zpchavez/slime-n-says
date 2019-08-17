@@ -33,7 +33,7 @@ class Keyboard
     notes.forEach(note => {
       this.controls[`${note}4`].press = () => this.playNote(note, 4);
       if (sharps.indexOf(note) > -1) {
-        this.controls[`${note}s4`].press = () => this.playNote(`${note}#`, 4);
+        this.controls[`${note}s4`].press = () => this.playNote(`${note}s`, 4);
       }
     })
     this.controls.C5.press = () => this.playNote('C', 5);
@@ -41,7 +41,8 @@ class Keyboard
   }
 
   playNote(note, octave) {
-    window.Synth.play(0, note, octave-1);
+    window.Synth.play(0, note.replace('s', '#'), octave-1);
+    this.keys[`${note}${octave}`].highlight();
   }
 
   drawKeys() {
@@ -55,6 +56,12 @@ class Keyboard
     sharps.forEach((n, i) => {
       const note = `${n}s4`;
       this.keys[note] = new BlackKey(this.g, i, controlMap[note]);
+    })
+  }
+
+  update() {
+    Object.keys(this.keys).forEach(k => {
+      this.keys[k].update();
     })
   }
 }
