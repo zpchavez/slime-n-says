@@ -41,10 +41,6 @@ class WhiteKey extends AbstractKey
   getTextColor() {
     return colors.black;
   }
-
-  update() {
-
-  }
 }
 
 export default WhiteKey;

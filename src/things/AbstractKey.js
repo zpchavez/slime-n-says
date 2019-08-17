@@ -1,7 +1,9 @@
+const HIGHLIGHT_SECONDS = 0.25;
 class Key
 {
   constructor(g, index, controlKey) {
     this.g = g;
+    this.highlightFrames = null;
     this.drawKey(index, controlKey)
   }
 
@@ -44,8 +46,18 @@ class Key
     );
   }
 
-  update() {
+  highlight() {
+    this.sprite.fillStyle = 'blue';
+    this.highlightFrames = HIGHLIGHT_SECONDS * this.g.fps;
+  }
 
+  update() {
+    if (this.highlightFrames === 0) {
+      this.sprite.fillStyle = this.getFillColor();
+      this.highlightFrames = null;
+    } else if (this.highlightFrames) {
+      this.highlightFrames -= 1;
+    }
   }
 }
 
