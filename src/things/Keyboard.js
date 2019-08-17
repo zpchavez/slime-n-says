@@ -1,16 +1,20 @@
 import getControls from '../controls';
+import WhiteKey from './WhiteKey';
+import BlackKey from './BlackKey';
+
+const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+const sharps = ['C', 'D', 'F', 'G', 'A'];
 
 class Keyboard
 {
   constructor(g) {
     this.g = g;
-    this.initControls()
+    this.initControls();
+    this.drawKeys();
   }
 
   initControls() {
     this.controls = getControls(this.g);
-    let notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-    let sharps = ['C', 'D', 'F', 'G', 'A'];
     notes.forEach(note => {
       this.controls[`${note}4`].press = () => this.playNote(note, 4);
       if (sharps.indexOf(note) > -1) {
@@ -22,7 +26,19 @@ class Keyboard
   }
 
   playNote(note, octave) {
-    window.Synth.play(0, note, octave);
+    window.Synth.play(0, note, octave-1);
+  }
+
+  drawKeys() {
+    this.keys = {};
+
+    notes.forEach((note, i) => {
+      this.keys[`${note}4`] = new WhiteKey(this.g, i);
+    })
+    this.keys[`C5`] = new WhiteKey(this.g, 7);
+    sharps.forEach((note, i) => {
+      this.keys[`${note}s4`] = new BlackKey(this.g, i);
+    })
   }
 }
 
