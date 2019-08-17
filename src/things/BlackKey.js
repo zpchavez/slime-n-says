@@ -1,38 +1,50 @@
+import AbstractKey from './AbstractKey';
 import colors from '../colors';
 import { KEY_WIDTH as WHITE_KEY_WIDTH } from './WhiteKey';
 
 const KEY_WIDTH = 20;
 const KEY_HEIGHT = 100;
 
-class BlackKey
+class BlackKey extends AbstractKey
 {
   constructor(g, index, controlKey) {
-    this.g = g;
-    this.drawKey(index, controlKey)
+    super(g, index, controlKey);
   }
 
-  drawKey(index, controlKey)
-  {
-    this.sprite = this.g.rectangle(
-      KEY_WIDTH,
-      KEY_HEIGHT,
-      '#121212',
-      '#000000',
-      1
-    );
-    this.sprite.x = 100 + (KEY_WIDTH + WHITE_KEY_WIDTH * index);
-    if (index > 1) {
-      this.sprite.x += WHITE_KEY_WIDTH;
-    }
-    this.sprite.y = 310;
+  getWidth() {
+    return KEY_WIDTH;
+  }
 
-    this.g.text(
-      controlKey,
-      '12px monospace',
-      colors.white,
-      this.sprite.x + 7,
-      this.sprite.y + KEY_HEIGHT - 20
-    );
+  getHeight() {
+    return KEY_HEIGHT;
+  }
+
+  getFillColor() {
+    return colors.black;
+  }
+
+  getStrokeColor() {
+    return '#777777';
+  }
+
+  getKeyXPos(index) {
+    let x = 100 + (KEY_WIDTH + WHITE_KEY_WIDTH * index);
+    if (index > 1) {
+      x += WHITE_KEY_WIDTH;
+    }
+    return x;
+  }
+
+  getKeyYPos() {
+    return 310;
+  }
+
+  getLabelXPos() {
+    return this.sprite.x + 7;
+  }
+
+  getTextColor() {
+    return colors.white;
   }
 
   update() {
