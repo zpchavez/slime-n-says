@@ -2,6 +2,7 @@ import getControls from '../controls';
 import WhiteKey from './WhiteKey';
 import BlackKey from './BlackKey';
 import Synth from '../../lib/synth';
+import colors from '../colors';
 
 const naturals = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 const sharps = ['C', 'D', 'F', 'G', 'A'];
@@ -40,18 +41,20 @@ class Keyboard
   initControls() {
     this.controls = getControls(this.g);
     naturals.forEach(note => {
-      this.controls[`${note}4`].press = () => this.playNote(note, 4);
+      this.controls[`${note}4`].press = () => this.playNote(note, 4, colors.blue);
       if (sharps.indexOf(note) > -1) {
-        this.controls[`${note}#4`].press = () => this.playNote(`${note}#`, 4);
+        this.controls[`${note}#4`].press = () => this.playNote(`${note}#`, 4, colors.blue);
       }
     })
-    this.controls.C5.press = () => this.playNote('C', 5);
+    this.controls.C5.press = () => this.playNote('C', 5, colors.blue);
     this.controls.confirm.press = () => this.generateMelody(6);
   }
 
-  playNote(note, octave) {
+  playNote(note, octave, highlightColor=null) {
     Synth.play(0, note, octave - 1);
-    this.keys[`${note}${octave}`].highlight();
+    if (highlightColor) {
+      this.keys[`${note}${octave}`].highlight(highlightColor);
+    }
     this.onCorrectNote();
   }
 
@@ -134,7 +137,7 @@ class Keyboard
       const noteAndOctave = melody.shift();
       const octave = noteAndOctave.charAt(noteAndOctave.length - 1);
       const note = noteAndOctave.replace(/\d/, '');
-      this.playNote(note, octave);
+      this.playNote(note, octave, colors.green);
       window.setTimeout(() => {
         this.playMelody(melody);
       }, 1000)
