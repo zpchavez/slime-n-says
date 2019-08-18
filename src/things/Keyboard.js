@@ -1,6 +1,7 @@
 import getControls from '../controls';
 import WhiteKey from './WhiteKey';
 import BlackKey from './BlackKey';
+import Synth from '../../lib/synth';
 
 const naturals = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 const sharps = ['C', 'D', 'F', 'G', 'A'];
@@ -44,7 +45,7 @@ class Keyboard
   }
 
   playNote(note, octave) {
-    window.Synth.play(0, note, octave - 1);
+    Synth.play(0, note, octave - 1);
     this.keys[`${note}${octave}`].highlight();
   }
 
