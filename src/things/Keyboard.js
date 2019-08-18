@@ -83,6 +83,8 @@ class Keyboard
         this.melody.shift();
       } else {
         this.playNote(note, octave, colors.red);
+        // Show what correct note was
+        this.keys[this.melody[0]].highlight(colors.lightBlue, 0.75);
         this.melody.shift();
         this.onWrongNote();
       }

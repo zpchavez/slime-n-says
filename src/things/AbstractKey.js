@@ -46,9 +46,9 @@ class Key
     );
   }
 
-  highlight(color) {
+  highlight(color, time=HIGHLIGHT_SECONDS) {
     this.sprite.fillStyle = color;
-    this.highlightFrames = HIGHLIGHT_SECONDS * this.g.fps;
+    this.highlightFrames = time * this.g.fps;
   }
 
   update() {
