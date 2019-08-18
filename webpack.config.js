@@ -43,7 +43,16 @@ if (environment === 'development') {
 } else if (environment === 'production') {
   if (process.env.MINIFIER === 'uglify') {
     config.plugins.push(
-      new UglifyJSPlugin()
+      new UglifyJSPlugin({
+        // uglifyOptions: {
+        //   mangle: {
+        //     properties: {
+        //       reserved: [],
+        //       regex: /test/,
+        //     }
+        //   }
+        // }
+      })
     );
   } else if (process.env.MINIFIER === 'closure') {
     config.plugins.push(
