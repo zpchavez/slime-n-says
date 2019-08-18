@@ -32,6 +32,7 @@ class Keyboard
     this.initControls();
     this.createKeys();
     this.onCorrectNote = () => {};
+    this.playingMelody = false;
   }
 
   setOnCorrectNote(callback) {
@@ -41,13 +42,20 @@ class Keyboard
   initControls() {
     this.controls = getControls(this.g);
     naturals.forEach(note => {
-      this.controls[`${note}4`].press = () => this.playNote(note, 4, colors.blue);
+      this.controls[`${note}4`].press = () => this.playNoteAsPlayer(note, 4);
       if (sharps.indexOf(note) > -1) {
-        this.controls[`${note}#4`].press = () => this.playNote(`${note}#`, 4, colors.blue);
+        this.controls[`${note}#4`].press = () => this.playNoteAsPlayer(`${note}#`, 4);
       }
     })
-    this.controls.C5.press = () => this.playNote('C', 5, colors.blue);
+    this.controls.C5.press = () => this.playNoteAsPlayer('C', 5);
     this.controls.confirm.press = () => this.generateMelody(6);
+  }
+
+  playNoteAsPlayer(note, octave) {
+    if (this.playingMelody) {
+      return;
+    }
+    this.playNote(note, octave, colors.blue);
   }
 
   playNote(note, octave, highlightColor=null) {
@@ -133,6 +141,7 @@ class Keyboard
   }
 
   playMelody(melody) {
+    this.playingMelody = true;
     if (melody.length) {
       const noteAndOctave = melody.shift();
       const octave = noteAndOctave.charAt(noteAndOctave.length - 1);
@@ -141,6 +150,8 @@ class Keyboard
       window.setTimeout(() => {
         this.playMelody(melody);
       }, 1000)
+    } else {
+      this.playingMelody = false;
     }
   }
 
