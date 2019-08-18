@@ -46,8 +46,8 @@ class Key
     );
   }
 
-  highlight() {
-    this.sprite.fillStyle = 'blue';
+  highlight(color) {
+    this.sprite.fillStyle = color;
     this.highlightFrames = HIGHLIGHT_SECONDS * this.g.fps;
   }
 
