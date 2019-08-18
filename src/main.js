@@ -1,6 +1,5 @@
 require('../lib/ga.js');
 require('../lib/custom.js');
-require('../lib/audiosynth');
 
 import gameState from './states/game';
 
