@@ -39,7 +39,7 @@ class Key
 
     this.g.text(
       controlKey,
-      '12px monospace',
+      '16px monospace',
       this.getTextColor(),
       this.getLabelXPos(),
       this.getLabelYPos()

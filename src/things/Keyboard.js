@@ -29,7 +29,12 @@ class Keyboard
   constructor(g) {
     this.g = g;
     this.initControls();
-    this.drawKeys();
+    this.createKeys();
+    this.onCorrectNote = () => {};
+  }
+
+  setOnCorrectNote(callback) {
+    this.onCorrectNote = callback;
   }
 
   initControls() {
@@ -47,6 +52,7 @@ class Keyboard
   playNote(note, octave) {
     Synth.play(0, note, octave - 1);
     this.keys[`${note}${octave}`].highlight();
+    this.onCorrectNote();
   }
 
   generateMelody(noteCount) {
@@ -135,7 +141,7 @@ class Keyboard
     }
   }
 
-  drawKeys() {
+  createKeys() {
     this.keys = {};
 
     naturals.forEach((n, i) => {

@@ -1,8 +1,8 @@
 import colors from '../colors';
 import AbstractKey from './AbstractKey';
 
-export const KEY_WIDTH = 40;
-const KEY_HEIGHT = 150;
+export const KEY_WIDTH = 80;
+const KEY_HEIGHT = 300;
 
 class WhiteKey extends AbstractKey
 {
@@ -27,15 +27,15 @@ class WhiteKey extends AbstractKey
   }
 
   getKeyXPos(index) {
-    return 90 + (KEY_WIDTH * index);
+    return 2 + (KEY_WIDTH * index);
   }
 
   getKeyYPos() {
-    return 310;
+    return 210;
   }
 
   getLabelXPos() {
-    return this.sprite.x + 15;
+    return this.sprite.x + 33;
   }
 
   getTextColor() {
