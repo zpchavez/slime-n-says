@@ -6,10 +6,10 @@ import gameState from './states/game';
 const ga = window.ga;
 
 var g = ga(
-  512,
+  644,
   512,
   () => {
-    g.canvas.style.border = "1px black dashed";
+    // g.canvas.style.border = "1px black dashed";
     g.canvas.style.display = "block";
     g.canvas.style.margin = "auto";
     g.backgroundColor = "white";
