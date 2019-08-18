@@ -32,11 +32,32 @@ class Keyboard
     this.initControls();
     this.createKeys();
     this.onCorrectNote = () => {};
-    this.playingMelody = false;
+    this.onWrongNote = () => {};
+    this.onMelodyPlayed = () => {};
+    this.onStart = () => {};
+    this.lockedInput = true;
+    this.started = false;
+  }
+
+  start() {
+    this.started = true;
+    this.onStart();
+  }
+
+  setOnStart(callback) {
+    this.onStart = callback;
   }
 
   setOnCorrectNote(callback) {
     this.onCorrectNote = callback;
+  }
+
+  setOnWrongNote(callback) {
+    this.onWrongNote = callback;
+  }
+
+  setOnMelodyPlayed(callback) {
+    this.onMelodyPlayed = callback;
   }
 
   initControls() {
@@ -48,14 +69,31 @@ class Keyboard
       }
     })
     this.controls.C5.press = () => this.playNoteAsPlayer('C', 5);
-    this.controls.confirm.press = () => this.generateMelody(6);
+    this.controls.confirm.press = () => this.start();
   }
 
   playNoteAsPlayer(note, octave) {
-    if (this.playingMelody) {
+    if (this.lockedInput) {
       return;
     }
-    this.playNote(note, octave, colors.blue);
+    if (this.melody.length) {
+      if (this.melody[0] === `${note}${octave}`) {
+        this.playNote(note, octave, colors.blue);
+        this.onCorrectNote();
+        this.melody.shift();
+      } else {
+        this.playNote(note, octave, colors.red);
+        this.melody.shift();
+        this.onWrongNote();
+      }
+
+      if (this.melody.length === 0) {
+        this.lockedInput = true;
+        this.onMelodyPlayed();
+      }
+    } else {
+      this.playNote(note, octave, colors.blue);
+    }
   }
 
   playNote(note, octave, highlightColor=null) {
@@ -63,7 +101,6 @@ class Keyboard
     if (highlightColor) {
       this.keys[`${note}${octave}`].highlight(highlightColor);
     }
-    this.onCorrectNote();
   }
 
   generateMelody(noteCount) {
@@ -137,11 +174,12 @@ class Keyboard
       }
     }
 
+    this.melody = melody.slice();
     this.playMelody(melody);
   }
 
   playMelody(melody) {
-    this.playingMelody = true;
+    this.lockedInput = true;
     if (melody.length) {
       const noteAndOctave = melody.shift();
       const octave = noteAndOctave.charAt(noteAndOctave.length - 1);
@@ -151,7 +189,7 @@ class Keyboard
         this.playMelody(melody);
       }, 1000)
     } else {
-      this.playingMelody = false;
+      this.lockedInput = false;
     }
   }
 
