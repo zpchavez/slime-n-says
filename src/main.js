@@ -14,7 +14,13 @@ var g = ga(
     g.canvas.style.margin = "auto";
     g.backgroundColor = "white";
     g.state = gameState(g);
-  }
+  },
+  [
+    "assets/neutral-slime.png",
+    "assets/happy-slime.png",
+    "assets/sad-slime.png",
+    "assets/angry-slime.png",
+  ]
 );
 
 g.start();
