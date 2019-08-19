@@ -77,14 +77,16 @@ class Keyboard
       return;
     }
     if (this.melody.length) {
+      const key = this.keys[`${note}${octave}`];
       if (this.melody[0] === `${note}${octave}`) {
         this.playNote(note, octave, colors.blue);
+        key.onCorrectNote();
         this.onCorrectNote();
         this.melody.shift();
       } else {
         this.playNote(note, octave, colors.red);
         // Show what correct note was
-        this.keys[this.melody[0]].highlight(colors.lightBlue, 0.75);
+        key.onWrongNote();
         this.melody.shift();
         this.onWrongNote();
       }

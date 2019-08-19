@@ -1,15 +1,9 @@
 import Keyboard from "../things/Keyboard";
-import Slime from '../things/Slime';
 
 export default (g) => {
   const keyboard = new Keyboard(g);
-  const slime = new Slime(g);
 
   let melodyLength = 2;
-
-  keyboard.setOnCorrectNote(() => {
-    slime.jump();
-  })
 
   keyboard.setOnMelodyPlayed(() => {
     melodyLength++;
@@ -27,6 +21,5 @@ export default (g) => {
 
   return () => {
     keyboard.update();
-    slime.update();
   };
 }
