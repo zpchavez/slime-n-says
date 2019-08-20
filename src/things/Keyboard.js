@@ -181,8 +181,12 @@ class Keyboard
           }
         }
       } else {
-        // If first note, can choose any diatonic note next
-        melody.push(this.g.randomPick(diatonicNotes));
+        // Second note can be any diatonic note except for the unison
+        melody.push(
+          this.g.randomPick(
+            diatonicNotes.filter(n => n !== melody[0])
+          )
+        );
       }
     }
 
