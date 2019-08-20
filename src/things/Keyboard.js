@@ -109,6 +109,12 @@ class Keyboard
     }
   }
 
+  resetSlimes() {
+    Object.keys(this.keys).forEach(key => {
+      this.keys[key].slime.resetMood();
+    })
+  }
+
   generateMelody(noteCount) {
     const ionianSteps = [2, 2, 1, 2, 2, 2, 1];
     const getDiatonicIndices = (startingIndex) => {

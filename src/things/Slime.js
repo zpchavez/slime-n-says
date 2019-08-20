@@ -18,6 +18,7 @@ class Slime
 
   resetMood() {
     this.mood = NEUTRAL;
+    this.drawSprite();
   }
 
   improveMood() {
