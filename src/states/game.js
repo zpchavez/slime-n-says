@@ -9,6 +9,7 @@ export default (g) => {
     melodyLength++;
     setTimeout(
       () => {
+        keyboard.resetSlimes();
         keyboard.generateMelody(melodyLength);
       },
       2000
