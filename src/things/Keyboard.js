@@ -87,6 +87,8 @@ class Keyboard
         this.playNote(note, octave, colors.red);
         // Show what correct note was
         key.onWrongNote();
+        const correctKey = this.keys[this.melody[0]];
+        correctKey.highlight(colors.lightBlue, .75);
         this.melody.shift();
         this.onWrongNote();
       }
@@ -186,9 +188,10 @@ class Keyboard
     this.lockedInput = true;
     if (melody.length) {
       const noteAndOctave = melody.shift();
+      this.keys[noteAndOctave].onMelodyNote();
       const octave = noteAndOctave.charAt(noteAndOctave.length - 1);
       const note = noteAndOctave.replace(/\d/, '');
-      this.playNote(note, octave, colors.green);
+      this.playNote(note, octave, colors.lightBlue);
       window.setTimeout(() => {
         this.playMelody(melody);
       }, 1000)
