@@ -31,9 +31,13 @@ class Key
     });
   }
 
+  onMelodyNote() {
+    this.slime.jump();
+  }
+
   onWrongNote() {
     this.slime.worsenMood();
-    this.highlight(colors.lightBlue, 0.75);
+    this.highlight(colors.red);
   }
 
   getLabelYPos() {

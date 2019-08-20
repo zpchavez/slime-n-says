@@ -65,7 +65,7 @@ class Slime
   }
 
   jump(onDoneJumping) {
-    this.onDoneJumping = onDoneJumping;
+    this.onDoneJumping = onDoneJumping ? onDoneJumping : () => {};
     if (!this.jumping && !this.falling) {
       this.jumping = true;
       this.sprite.vy = -5;
