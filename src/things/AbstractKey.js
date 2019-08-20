@@ -37,7 +37,6 @@ class Key
 
   onWrongNote() {
     this.slime.worsenMood();
-    this.highlight(colors.red);
   }
 
   getLabelYPos() {

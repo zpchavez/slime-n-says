@@ -3,7 +3,7 @@ import colors from '../colors';
 const HAPPY = 1;
 const NEUTRAL = 0;
 const SAD = -1;
-const ANGRY = -2;
+export const ANGRY = -2;
 
 class Slime
 {
