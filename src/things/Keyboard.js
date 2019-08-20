@@ -3,6 +3,7 @@ import WhiteKey from './WhiteKey';
 import BlackKey from './BlackKey';
 import Synth from '../../lib/synth';
 import colors from '../colors';
+import { ANGRY } from './Slime'
 
 const naturals = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 const sharps = ['C', 'D', 'F', 'G', 'A'];
@@ -76,6 +77,7 @@ class Keyboard
     if (this.lockedInput) {
       return;
     }
+
     if (this.melody.length) {
       const key = this.keys[`${note}${octave}`];
       if (this.melody[0] === `${note}${octave}`) {
@@ -84,13 +86,20 @@ class Keyboard
         this.onCorrectNote();
         this.melody.shift();
       } else {
-        this.playNote(note, octave, colors.red);
-        // Show what correct note was
-        key.onWrongNote();
-        const correctKey = this.keys[this.melody[0]];
-        correctKey.highlight(colors.lightBlue, .75);
-        this.melody.shift();
-        this.onWrongNote();
+        if (key.slime.mood !== ANGRY) {
+          this.playNote(note, octave, colors.red);
+
+          // Show what correct note was
+          const correctKey = this.keys[this.melody[0]];
+          correctKey.highlight(colors.lightBlue, .75);
+
+          this.melody.shift();
+          key.onWrongNote();
+          this.onWrongNote();
+        } else {
+          // Once slime is angry, note cannot be played again (unless it's the right note)
+          key.highlight(colors.red);
+        }
       }
 
       if (this.melody.length === 0) {
