@@ -125,6 +125,7 @@ class Keyboard
   }
 
   generateMelody(noteCount) {
+    this.melodyLength = noteCount;
     const ionianSteps = [2, 2, 1, 2, 2, 2, 1];
     const getDiatonicIndices = (startingIndex) => {
       const indices = [startingIndex];
@@ -213,9 +214,12 @@ class Keyboard
       const octave = noteAndOctave.charAt(noteAndOctave.length - 1);
       const note = noteAndOctave.replace(/\d/, '');
       this.playNote(note, octave, colors.lightBlue);
+
+      // Go faster as there are more notes.
+      const delay = 1000 - Math.min((this.melodyLength * 80), 800);
       window.setTimeout(() => {
         this.playMelody(melody);
-      }, 1000)
+      }, delay)
     } else {
       this.lockedInput = false;
     }
