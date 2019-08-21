@@ -1,6 +1,6 @@
 import colors from '../colors';
 
-const HAPPY = 1;
+export const HAPPY = 1;
 const NEUTRAL = 0;
 const SAD = -1;
 export const ANGRY = -2;
@@ -13,6 +13,11 @@ class Slime
     this.mood = NEUTRAL;
     this.parentSprite = parentSprite;
     this.onDoneJumping = () => {};
+    this.drawSprite();
+  }
+
+  setMood(mood) {
+    this.mood = mood;
     this.drawSprite();
   }
 

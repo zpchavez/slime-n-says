@@ -3,7 +3,7 @@ import WhiteKey from './WhiteKey';
 import BlackKey from './BlackKey';
 import Synth from '../../lib/synth';
 import colors from '../colors';
-import { ANGRY } from './Slime'
+import { HAPPY, ANGRY } from './Slime'
 
 const naturals = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 const sharps = ['C', 'D', 'F', 'G', 'A'];
@@ -200,6 +200,8 @@ class Keyboard
     }
 
     this.melody = melody.slice();
+    // First key slime starts off happy
+    this.keys[melody[0]].slime.setMood(HAPPY);
     this.playMelody(melody);
   }
 
