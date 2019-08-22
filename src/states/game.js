@@ -1,23 +1,29 @@
-import Keyboard from "../things/Keyboard";
+import Keyboard from '../things/Keyboard';
+import Hud from '../things/Hud';
 
 export default (g) => {
   const keyboard = new Keyboard(g);
+  const hud = new Hud(g);
 
   let melodyLength = 2;
 
-  keyboard.setOnMelodyPlayed(() => {
+  const generateMelody = () => {
+    hud.setText('Listen');
+    keyboard.resetSlimes();
+    keyboard.generateMelody(melodyLength);
+  }
+
+  keyboard.setOnPlayerDone(() => {
     melodyLength++;
     setTimeout(
-      () => {
-        keyboard.resetSlimes();
-        keyboard.generateMelody(melodyLength);
-      },
+      generateMelody,
       2000
     );
   });
 
-  keyboard.setOnStart(() => {
-    keyboard.generateMelody(2)
+  keyboard.setOnStart(generateMelody);
+  keyboard.setOnMelodyDone(() => {
+    hud.setText('Play');
   });
 
   return () => {
