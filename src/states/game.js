@@ -2,8 +2,8 @@ import Keyboard from '../things/Keyboard';
 import Hud from '../things/Hud';
 
 export default (g) => {
-  const keyboard = new Keyboard(g);
   const hud = new Hud(g);
+  const keyboard = new Keyboard(g, hud);
 
   let melodyLength = 2;
 
@@ -22,9 +22,6 @@ export default (g) => {
   });
 
   keyboard.setOnStart(generateMelody);
-  keyboard.setOnMelodyDone(() => {
-    hud.setText('Play');
-  });
 
   return () => {
     keyboard.update();

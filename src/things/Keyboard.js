@@ -28,17 +28,17 @@ const controlMap = {
 
 class Keyboard
 {
-  constructor(g) {
+  constructor(g, hud) {
     this.g = g;
     this.initControls();
     this.createKeys();
     this.onCorrectNote = () => {};
-    this.onWrongNote = () => {};
     this.onPlayerDone = () => {};
     this.onStart = () => {};
-    this.onMelodyDone = () => {};
+    this.pauseUntilNotePlayed = false;
     this.lockedInput = true;
     this.started = false;
+    this.hud = hud;
   }
 
   start() {
@@ -62,10 +62,6 @@ class Keyboard
     this.onPlayerDone = callback;
   }
 
-  setOnMelodyDone(callback) {
-    this.onMelodyDone = callback;
-  }
-
   initControls() {
     this.controls = getControls(this.g);
     naturals.forEach(note => {
@@ -83,7 +79,15 @@ class Keyboard
       return;
     }
 
-    if (this.melody.length) {
+    if (this.pauseUntilNotePlayed) {
+      if (this.pauseUntilNotePlayed !== `${note}${octave}`) {
+        return;
+      }
+      this.playNote(note, octave, colors.blue);
+      this.pauseUntilNotePlayed = false;
+      this.melody.shift();
+      this.hud.setText('Continue');
+    } else if (this.melody.length) {
       const key = this.keys[`${note}${octave}`];
       if (this.melody[0] === `${note}${octave}`) {
         this.playNote(note, octave, colors.blue);
@@ -91,35 +95,35 @@ class Keyboard
         this.onCorrectNote();
         this.melody.shift();
       } else {
+        this.pauseUntilNotePlayed = this.melody[0];
         if (key.slime.mood !== ANGRY) {
           this.playNote(note, octave, colors.red);
 
           // Show what correct note was
           const correctKey = this.keys[this.melody[0]];
-          correctKey.highlight(colors.lightBlue, .75);
+          correctKey.highlight(colors.lightBlue);
 
-          this.melody.shift();
           key.onWrongNote();
-          this.onWrongNote();
+          this.hud.setText('Play correct note to continue');
         } else {
           // Once slime is angry, note cannot be played again (unless it's the right note)
-          key.highlight(colors.red);
+          key.highlight(colors.red, 0.25);
         }
       }
-
-      if (this.melody.length === 0) {
-        this.lockedInput = true;
-        this.onPlayerDone();
-      }
-    } else {
+    } else if (!this.pauseUntilNotePlayed) {
       this.playNote(note, octave, colors.blue);
+    }
+
+    if (this.melody && this.melody.length === 0) {
+      this.lockedInput = true;
+      this.onPlayerDone();
     }
   }
 
   playNote(note, octave, highlightColor=null) {
     Synth.play(0, note, octave - 1);
     if (highlightColor) {
-      this.keys[`${note}${octave}`].highlight(highlightColor);
+      this.keys[`${note}${octave}`].highlight(highlightColor, 0.25);
     }
   }
 
@@ -227,7 +231,7 @@ class Keyboard
       }, delay)
     } else {
       this.lockedInput = false;
-      this.onMelodyDone();
+      this.hud.setText('Play');
     }
   }
 

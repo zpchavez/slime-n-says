@@ -1,7 +1,6 @@
 import Slime from './Slime';
 import colors from '../colors';
 
-const HIGHLIGHT_SECONDS = 0.25;
 class Key
 {
   constructor(g, index, controlKey) {
@@ -69,9 +68,11 @@ class Key
     this.slime.sprite.y--;
   }
 
-  highlight(color, time=HIGHLIGHT_SECONDS) {
+  highlight(color, time) {
     this.sprite.fillStyle = color;
-    this.highlightFrames = time * this.g.fps;
+    if (time) {
+      this.highlightFrames = time * this.g.fps;
+    }
   }
 
   update() {
