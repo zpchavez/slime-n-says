@@ -34,8 +34,9 @@ class Keyboard
     this.createKeys();
     this.onCorrectNote = () => {};
     this.onWrongNote = () => {};
-    this.onMelodyPlayed = () => {};
+    this.onPlayerDone = () => {};
     this.onStart = () => {};
+    this.onMelodyDone = () => {};
     this.lockedInput = true;
     this.started = false;
   }
@@ -57,8 +58,12 @@ class Keyboard
     this.onWrongNote = callback;
   }
 
-  setOnMelodyPlayed(callback) {
-    this.onMelodyPlayed = callback;
+  setOnPlayerDone(callback) {
+    this.onPlayerDone = callback;
+  }
+
+  setOnMelodyDone(callback) {
+    this.onMelodyDone = callback;
   }
 
   initControls() {
@@ -104,7 +109,7 @@ class Keyboard
 
       if (this.melody.length === 0) {
         this.lockedInput = true;
-        this.onMelodyPlayed();
+        this.onPlayerDone();
       }
     } else {
       this.playNote(note, octave, colors.blue);
@@ -222,6 +227,7 @@ class Keyboard
       }, delay)
     } else {
       this.lockedInput = false;
+      this.onMelodyDone();
     }
   }
 
