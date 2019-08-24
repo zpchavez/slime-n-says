@@ -1,5 +1,4 @@
 import Slime from './Slime';
-import colors from '../colors';
 
 class Key
 {
