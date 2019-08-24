@@ -24,9 +24,10 @@ class Key
    * getHeight() {}
    */
 
-  onCorrectNote() {
+  onCorrectNote(onDone=()=>{}) {
     this.slime.jump(() => {
       this.slime.improveMood();
+      onDone()
     });
   }
 
