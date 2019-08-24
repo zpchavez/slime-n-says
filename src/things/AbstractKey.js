@@ -35,7 +35,9 @@ class Key
   }
 
   onWrongNote() {
-    this.slime.worsenMood();
+    this.slime.shake(() => {
+      this.slime.worsenMood();
+    });
   }
 
   getLabelYPos() {
