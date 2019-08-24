@@ -32,9 +32,6 @@ class Keyboard
     this.g = g;
     this.initControls();
     this.createKeys();
-    this.onCorrectNote = () => {};
-    this.onPlayerDone = () => {};
-    this.onStart = () => {};
     this.pauseUntilNotePlayed = false;
     this.lockedInput = true;
     this.started = false;
@@ -44,23 +41,14 @@ class Keyboard
 
   start() {
     this.started = true;
-    this.onStart();
+    this.melodyLength = 2;
+    this.startRound();
   }
 
-  setOnStart(callback) {
-    this.onStart = callback;
-  }
-
-  setOnCorrectNote(callback) {
-    this.onCorrectNote = callback;
-  }
-
-  setOnWrongNote(callback) {
-    this.onWrongNote = callback;
-  }
-
-  setOnPlayerDone(callback) {
-    this.onPlayerDone = callback;
+  startRound() {
+    this.hud.setText('Listen');
+    this.resetSlimes();
+    this.generateMelody();
   }
 
   initControls() {
@@ -100,7 +88,6 @@ class Keyboard
       if (this.melody[0] === `${note}${octave}`) {
         this.playNote(note, octave, colors.blue);
         key.onCorrectNote();
-        this.onCorrectNote();
         this.melody.shift();
         this.hud.setText('Play');
       } else {
@@ -126,8 +113,12 @@ class Keyboard
 
     if (this.melody && this.melody.length === 0) {
       this.lockedInput = true;
-      this.onPlayerDone();
       this.repeated = false;
+      this.melodyLength++;
+      setTimeout(
+        this.startRound.bind(this),
+        2000
+      );
     }
   }
 
@@ -144,8 +135,7 @@ class Keyboard
     })
   }
 
-  generateMelody(noteCount) {
-    this.melodyLength = noteCount;
+  generateMelody() {
     const ionianSteps = [2, 2, 1, 2, 2, 2, 1];
     const getDiatonicIndices = (startingIndex) => {
       const indices = [startingIndex];
@@ -172,7 +162,7 @@ class Keyboard
     const diatonicNotes = notes.filter((n, i) => diatonicIndices.indexOf(i) > -1);
 
     const melody = [this.g.randomPick(diatonicNotes)];
-    for (let i = 1; i < noteCount; i += 1) {
+    for (let i = 1; i < this.melodyLength; i += 1) {
       if (melody.length > 1) {
         const previousNote = melody[melody.length - 1];
         const nextPreviousNote = melody[melody.length - 2];
