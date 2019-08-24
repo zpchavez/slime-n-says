@@ -2,14 +2,14 @@ require('../lib/ga.js');
 require('../lib/custom.js');
 
 import gameState from './states/game';
+import { scale } from './config'
 
 const ga = window.ga;
 
 var g = ga(
-  644,
-  512,
+  644 * scale,
+  512 * scale,
   () => {
-    // g.canvas.style.border = "1px black dashed";
     g.canvas.style.display = "block";
     g.canvas.style.margin = "auto";
     g.backgroundColor = "white";

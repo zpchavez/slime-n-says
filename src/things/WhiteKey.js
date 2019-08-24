@@ -1,8 +1,9 @@
 import colors from '../colors';
 import AbstractKey from './AbstractKey';
+import { scale } from '../config';
 
-export const KEY_WIDTH = 80;
-const KEY_HEIGHT = 300;
+export const KEY_WIDTH = 80 * scale;
+const KEY_HEIGHT = 300 * scale;
 
 class WhiteKey extends AbstractKey
 {
