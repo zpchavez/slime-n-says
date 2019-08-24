@@ -38,6 +38,7 @@ class Keyboard
     this.pauseUntilNotePlayed = false;
     this.lockedInput = true;
     this.started = false;
+    this.repeated = false;
     this.hud = hud;
   }
 
@@ -71,7 +72,14 @@ class Keyboard
       }
     })
     this.controls.C5.press = () => this.playNoteAsPlayer('C', 5);
-    this.controls.confirm.press = () => this.start();
+    this.controls.confirm.press = () => {
+      if (!this.started) {
+        this.start();
+      } else if (!this.repeated) {
+        this.playMelody(this.melody.slice());
+        this.repeated = true;
+      }
+    }
   }
 
   playNoteAsPlayer(note, octave) {
@@ -94,6 +102,7 @@ class Keyboard
         key.onCorrectNote();
         this.onCorrectNote();
         this.melody.shift();
+        this.hud.setText('Play');
       } else {
         this.pauseUntilNotePlayed = this.melody[0];
         if (key.slime.mood !== ANGRY) {
@@ -117,6 +126,7 @@ class Keyboard
     if (this.melody && this.melody.length === 0) {
       this.lockedInput = true;
       this.onPlayerDone();
+      this.repeated = false;
     }
   }
 
@@ -231,7 +241,11 @@ class Keyboard
       }, delay)
     } else {
       this.lockedInput = false;
-      this.hud.setText('Play');
+      if (!this.repeated) {
+        this.hud.setText('Enter to repeat or start playing');
+      } else {
+        this.hud.setText('Play');
+      }
     }
   }
 
