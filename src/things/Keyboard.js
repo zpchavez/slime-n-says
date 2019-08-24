@@ -3,7 +3,7 @@ import WhiteKey from './WhiteKey';
 import BlackKey from './BlackKey';
 import Synth, { PIANO, OUT_OF_TUNE_PIANO } from '../../lib/synth';
 import colors from '../colors';
-import { HAPPY, ANGRY } from './Slime'
+import { HAPPY, NEUTRAL, SAD, ANGRY } from './Slime'
 
 const naturals = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 const sharps = ['C', 'D', 'F', 'G', 'A'];
@@ -51,6 +51,26 @@ class Keyboard
     this.generateMelody();
   }
 
+  showResults() {
+    let totalScore = 0;
+    Object.keys(this.keys).forEach(key => {
+      totalScore += this.keys[key].slime.mood;
+    });
+    if (totalScore === 0) {
+      this.hud.setText('Slimes are neutral');
+      this.melodyLength--; // set melody length back to what it was
+    } else if (totalScore > 0) {
+      this.hud.setText('Slimes are mostly happy')
+    } else {
+      this.hud.setText('Slimes are upset', 'Press enter to start over');
+      this.started = false;
+    }
+
+    if (totalScore >= 0) {
+      setTimeout(this.startRound.bind(this), 2000);
+    }
+  }
+
   initControls() {
     this.controls = getControls(this.g);
     naturals.forEach(note => {
@@ -70,6 +90,17 @@ class Keyboard
     }
   }
 
+  endRoundIfMelodyOver() {
+    if (this.melody.length === 0) {
+      this.lockedInput = true;
+      this.repeated = false;
+      this.melodyLength++;
+      this.showResults();
+      return true;
+    }
+    return false;
+  }
+
   playNoteAsPlayer(note, octave) {
     if (this.lockedInput) {
       return;
@@ -82,13 +113,13 @@ class Keyboard
       this.playNote(note, octave, colors.blue);
       this.pauseUntilNotePlayed = false;
       this.melody.shift();
-      this.hud.setText('Continue');
+      this.endRoundIfMelodyOver() || this.hud.setText('Continue');
     } else if (this.melody && this.melody.length) {
       const key = this.keys[`${note}${octave}`];
       if (this.melody[0] === `${note}${octave}`) {
         this.playNote(note, octave, colors.blue);
-        key.onCorrectNote();
         this.melody.shift();
+        key.onCorrectNote(this.endRoundIfMelodyOver.bind(this));
         this.hud.setText('Play');
       } else {
         if (key.slime.mood !== ANGRY) {
@@ -104,21 +135,11 @@ class Keyboard
         } else {
           // Once slime is angry, note cannot be played again (unless it's the right note)
           key.highlight(colors.red, 0.25);
-          this.hud.setText('Slime is angry. Play another key.');
+          this.hud.setText('Slime is angry', 'Play another key');
         }
       }
     } else if (!this.pauseUntilNotePlayed) {
       this.playNote(note, octave, colors.blue);
-    }
-
-    if (this.melody && this.melody.length === 0) {
-      this.lockedInput = true;
-      this.repeated = false;
-      this.melodyLength++;
-      setTimeout(
-        this.startRound.bind(this),
-        2000
-      );
     }
   }
 
