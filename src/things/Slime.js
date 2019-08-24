@@ -79,6 +79,27 @@ class Slime
     }
   }
 
+  shake(onDoneShaking) {
+    let shakes = 8; // must be even number
+    const shakeAmount = 2;
+    const shakeInterval = 50;
+    let shakeDirection = 1;
+    const shake = () => {
+      this.sprite.x += shakeAmount * shakeDirection;
+      shakeDirection *= -1;
+      if (shakes > 0) {
+        shakes--;
+        setTimeout(
+          shake,
+          shakeInterval
+        );
+      } else {
+        onDoneShaking();
+      }
+    }
+    shake();
+  }
+
   update() {
     if (this.jumping) {
       if (this.jumpFrames === 0) {
