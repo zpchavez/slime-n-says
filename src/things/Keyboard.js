@@ -1,7 +1,7 @@
 import getControls from '../controls';
 import WhiteKey from './WhiteKey';
 import BlackKey from './BlackKey';
-import Synth from '../../lib/synth';
+import Synth, { PIANO, OUT_OF_TUNE_PIANO } from '../../lib/synth';
 import colors from '../colors';
 import { HAPPY, ANGRY } from './Slime'
 
@@ -83,7 +83,7 @@ class Keyboard
       this.pauseUntilNotePlayed = false;
       this.melody.shift();
       this.hud.setText('Continue');
-    } else if (this.melody.length) {
+    } else if (this.melody && this.melody.length) {
       const key = this.keys[`${note}${octave}`];
       if (this.melody[0] === `${note}${octave}`) {
         this.playNote(note, octave, colors.blue);
@@ -93,7 +93,7 @@ class Keyboard
       } else {
         if (key.slime.mood !== ANGRY) {
           this.pauseUntilNotePlayed = this.melody[0];
-          this.playNote(note, octave, colors.red);
+          this.playNote(note, octave, colors.red, OUT_OF_TUNE_PIANO);
 
           // Show what correct note was
           const correctKey = this.keys[this.melody[0]];
@@ -122,8 +122,8 @@ class Keyboard
     }
   }
 
-  playNote(note, octave, highlightColor=null) {
-    Synth.play(0, note, octave - 1);
+  playNote(note, octave, highlightColor=null, instrument=PIANO) {
+    Synth.play(instrument, note, octave - 1);
     if (highlightColor) {
       this.keys[`${note}${octave}`].highlight(highlightColor, 0.25);
     }
