@@ -104,8 +104,8 @@ class Keyboard
         this.melody.shift();
         this.hud.setText('Play');
       } else {
-        this.pauseUntilNotePlayed = this.melody[0];
         if (key.slime.mood !== ANGRY) {
+          this.pauseUntilNotePlayed = this.melody[0];
           this.playNote(note, octave, colors.red);
 
           // Show what correct note was
@@ -117,6 +117,7 @@ class Keyboard
         } else {
           // Once slime is angry, note cannot be played again (unless it's the right note)
           key.highlight(colors.red, 0.25);
+          this.hud.setText('Slime is angry. Play another key.');
         }
       }
     } else if (!this.pauseUntilNotePlayed) {
