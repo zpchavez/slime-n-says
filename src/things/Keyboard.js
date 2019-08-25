@@ -32,11 +32,30 @@ class Keyboard
     this.g = g;
     this.initControls();
     this.createKeys();
+    this.initMidi();
     this.pauseUntilNotePlayed = false;
     this.lockedInput = true;
     this.started = false;
     this.repeated = false;
     this.hud = hud;
+  }
+
+  initMidi() {
+    if (navigator.requestMIDIAccess) {
+      navigator.requestMIDIAccess().then(midiAccess => {
+        for (var input of midiAccess.inputs.values()) {
+          input.onmidimessage = (message) => {
+            const NOTE_ON = 159;
+            const startingNote = 60;
+            if (message.data[0] === NOTE_ON && message.data[1] >= startingNote && message.data[1] < 73) {
+              const noteIndex = message.data[1] - startingNote;
+              const noteParts = notes[noteIndex].match(/^(\D+)(\d)$/);
+              this.playNoteAsPlayer(noteParts[1], noteParts[2]);
+            }
+          }
+        }
+      });
+    }
   }
 
   start() {
