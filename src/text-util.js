@@ -1,12 +1,11 @@
 class TextUtil {
   constructor(g) {
     this.g = g;
-    this.texts = [];
   }
 
-  clear() {
-    this.g.remove(this.texts);
-  }
+  // clear() {
+  //   this.g.remove(this.texts);
+  // }
 
   // createText(string, size, color, x, y) {
   //   const text = this.g.text(
@@ -54,8 +53,6 @@ class TextUtil {
       g.stage.halfWidth - ((string.length / 2) * ((size + letterSpacing) / 2)),
       y
     );
-
-    this.texts.push(text);
 
     return text;
   }

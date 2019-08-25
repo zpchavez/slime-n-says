@@ -38,6 +38,10 @@ class Keyboard
     this.started = false;
     this.repeated = false;
     this.hud = hud;
+    this.totalNotes = 0;
+    this.correctNotes = 0;
+    this.level = 1;
+    this.subLevel = 1;
   }
 
   initMidi() {
@@ -47,7 +51,11 @@ class Keyboard
           input.onmidimessage = (message) => {
             const NOTE_ON = 159;
             const startingNote = 60;
-            if (message.data[0] === NOTE_ON && message.data[1] >= startingNote && message.data[1] < 73) {
+            if (
+              message.data[0] === NOTE_ON &&
+              message.data[1] >= startingNote
+              && message.data[1] < (startingNote + 13)
+            ) {
               const noteIndex = message.data[1] - startingNote;
               const noteParts = notes[noteIndex].match(/^(\D+)(\d)$/);
               this.playNoteAsPlayer(noteParts[1], noteParts[2]);
@@ -62,6 +70,7 @@ class Keyboard
     this.started = true;
     this.melodyLength = 2;
     this.startRound();
+    this.hud.setFooterText('Level 1-1');
   }
 
   startRound() {
@@ -87,8 +96,27 @@ class Keyboard
     }
 
     if (totalScore >= 0) {
-      setTimeout(this.startRound.bind(this), 2000);
+      if (this.subLevel === 8 && this.level === 3) {
+        this.showWinScreen();
+      } else {
+        if (this.subLevel < 8) {
+          this.subLevel++;
+        } else {
+          this.level++;
+          this.subLevel = 1;
+          this.melodyLength = 2;
+        }
+
+        setTimeout(() => {
+          this.startRound();
+          this.hud.setFooterText(`Level ${this.level}-${this.subLevel}`);
+        }, 2000);
+      }
     }
+  }
+
+  showWinScreen() {
+    this.hud.setText('Winner!');
   }
 
   initControls() {
@@ -177,11 +205,32 @@ class Keyboard
   }
 
   generateMelody() {
-    const ionianSteps = [2, 2, 1, 2, 2, 2, 1];
-    const getDiatonicIndices = (startingIndex) => {
+    const scalesByLevel = {
+      1: {
+        Pentatonic: [2, 2, 3, 2],
+        ['Whole Tone']: [2, 2, 2, 2, 2, 2],
+      },
+      2: {
+        Major: [2, 2, 1, 2, 2, 2, 1],
+        ['Jazz Minor']: [2, 1, 2, 2, 2, 2, 1],
+        ['Harmonic Minor']: [2, 1, 2, 2, 1, 3, 1],
+      },
+      3: {
+        Diminished: [1, 2, 1, 2, 1, 2, 1, 2],
+        Chromatic: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        ['Double Harmonic']: [1, 3, 1, 2, 1, 3, 1],
+      }
+    }
+    const scales = scalesByLevel[this.level];
+    const scaleName = this.g.randomPick(
+      Object.keys(scales)
+    );
+    const scale = scales[scaleName];
+
+    const getNoteIndices = (startingIndex) => {
       const indices = [startingIndex];
-      ionianSteps.forEach((step, i) => {
-        if (startingIndex > 0 && i === ionianSteps.length - 1) {
+      scale.forEach((step, i) => {
+        if (startingIndex > 0 && i === scale.length - 1) {
           // Only C4 has an octave. Skip the last interval for the others.
           return;
         }
@@ -196,7 +245,7 @@ class Keyboard
     const keyCenters = {};
     notes.forEach((note, i) => {
       if (note === 'C5') return;
-      keyCenters[note.replace('4', '')] = getDiatonicIndices(i);
+      keyCenters[note.replace('4', '')] = getNoteIndices(i);
     })
     const randomKey = this.g.randomPick(Object.keys(keyCenters));
     const diatonicIndices = keyCenters[randomKey];
@@ -255,6 +304,7 @@ class Keyboard
     // First key slime starts off happy
     this.keys[melody[0]].slime.setMood(HAPPY);
     this.playMelody(melody);
+    this.totalNotes += this.melodyLength;
   }
 
   playMelody(melody) {
