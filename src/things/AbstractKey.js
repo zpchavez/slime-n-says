@@ -30,10 +30,6 @@ class Key
     });
   }
 
-  onMelodyNote() {
-    this.slime.jump();
-  }
-
   onWrongNote() {
     this.slime.shake(() => {
       this.slime.worsenMood();

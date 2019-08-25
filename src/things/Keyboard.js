@@ -7,6 +7,10 @@ import TextUtil from '../text-util';
 import { lpad, rpad } from '../utils';
 import Slime, { HAPPY, SAD, ANGRY } from './Slime'
 
+const SHOW_ALL_NOTES = 0;
+const SHOW_FIRST_NOTE = 1;
+const modes = [SHOW_ALL_NOTES, SHOW_FIRST_NOTE];
+
 const naturals = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 const sharps = ['C', 'D', 'F', 'G', 'A'];
 const notes = [
@@ -32,11 +36,12 @@ class Keyboard
 {
   constructor(g, hud) {
     this.g = g;
+    this.textUtil = new TextUtil(g);
     this.initControls();
     this.createKeys();
     this.initMidi();
     this.pauseUntilNotePlayed = false;
-    this.lockedInput = true;
+    this.lockedInput = false;
     this.onWinScreen = false;
     this.started = false;
     this.repeated = false;
@@ -51,6 +56,7 @@ class Keyboard
     };
     this.level = 1;
     this.subLevel = 1;
+    this.showMenu();
   }
 
   initMidi() {
@@ -75,8 +81,29 @@ class Keyboard
     }
   }
 
+  showMenu() {
+    this.hud.setText('Select Mode');
+    this.menuTexts = this.textUtil.centeredTexts(
+      [
+        'Show All Notes  (Easier)',
+        'Show First Note (Harder)',
+      ],
+      18,
+      colors.black,
+      40,
+      32,
+    );
+    this.cursor = new Slime(this.g);
+    this.cursor.setMood(HAPPY);
+    this.cursor.sprite.y = this.menuTexts[0].y;
+    this.cursor.sprite.x = this.menuTexts[0].x - 24;
+    this.selectedMode = SHOW_ALL_NOTES;
+  }
+
   start() {
     this.started = true;
+    this.g.remove(this.menuTexts);
+    this.g.remove(this.cursor.sprite);
     this.startTime = new Date();
     this.melodyLength = 2;
     this.startRound();
@@ -89,6 +116,7 @@ class Keyboard
     this.texts = [];
     this.slimes = [];
     this.started = false;
+    this.selectedMode = SHOW_ALL_NOTES;
   }
 
   startRound() {
@@ -116,6 +144,7 @@ class Keyboard
         `Slimes don't want to play anymore`,
         `Slimes have lost the music in their hearts`,
         `Slimes just remembered they have a thing`,
+        `Slimes are kicking you out of the band`,
       ]
       this.hud.setText('Game Over', this.g.randomPick(messages));
       this.started = false;
@@ -147,8 +176,7 @@ class Keyboard
     const time = (this.endTime.getTime() - this.startTime.getTime())/1000;
     const minutes = Math.floor(time / 60).toString();
     const seconds = (time % 60).toFixed(3);
-    const textUtil = new TextUtil(this.g);
-    this.texts = textUtil.centeredTexts(
+    this.texts = this.textUtil.centeredTexts(
       [
         rpad('Mode', 16) + 'Show all notes',
         rpad('Correct Notes', 16) + `${rate.toFixed(2)}%`,
@@ -177,6 +205,21 @@ class Keyboard
     this.onWinScreen = true;
   }
 
+  toggleMode() {
+    if (this.started) {
+      return;
+    }
+
+    if (this.selectedMode === SHOW_ALL_NOTES) {
+      this.selectedMode = SHOW_FIRST_NOTE;
+    } else {
+      this.selectedMode = SHOW_ALL_NOTES;
+    }
+
+    this.cursor.sprite.x = this.menuTexts[this.selectedMode].x - 24;
+    this.cursor.sprite.y = this.menuTexts[this.selectedMode].y;
+  }
+
   initControls() {
     this.controls = getControls(this.g);
     naturals.forEach(note => {
@@ -196,6 +239,8 @@ class Keyboard
         this.repeated = true;
       }
     }
+    this.controls.up.press = this.toggleMode.bind(this);
+    this.controls.down.press = this.toggleMode.bind(this);
   }
 
   endRoundIfMelodyOver() {
@@ -375,11 +420,20 @@ class Keyboard
   playMelody(melody) {
     this.lockedInput = true;
     if (melody.length) {
+      const isFirstNote = melody.length === this.melodyLength;
       const noteAndOctave = melody.shift();
-      this.keys[noteAndOctave].onMelodyNote();
+      if (this.selectedMode === SHOW_ALL_NOTES || isFirstNote) {
+        this.keys[noteAndOctave].slime.jump();
+      }
       const octave = noteAndOctave.charAt(noteAndOctave.length - 1);
       const note = noteAndOctave.replace(/\d/, '');
-      this.playNote(note, octave, colors.lightBlue);
+      this.playNote(
+        note,
+        octave,
+        this.selectedMode === SHOW_FIRST_NOTE && !isFirstNote
+          ? null
+          : colors.lightBlue
+      );
 
       // Go faster as there are more notes.
       const delay = 1000 - Math.min((this.melodyLength * 80), 800);
