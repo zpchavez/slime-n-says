@@ -15,11 +15,25 @@ class Hud
       // Text is the same. No need to do anything.
       return;
     }
+
     if (this.text) {
-      this.textUtil.clear();
+      this.g.remove(this.text);
     }
     this.text = this.textUtil.centeredText(text, 24, '#000000', 0);
-    this.subText = this.textUtil.centeredText(subText, 18, '#000000', 32);
+    if (this.subText && this.subText.content !== subText) {
+      this.g.remove(this.subText);
+      this.subText = this.textUtil.centeredText(subText, 18, '#000000', 32);
+    }
+  }
+
+  setFooterText(text) {
+    if (this.footerText && this.footerText.content === text) {
+      return;
+    }
+    if (this.footerText) {
+      this.g.remove(this.footerText);
+    }
+    this.footerText = this.textUtil.centeredText(text, 18, '#000000', this.g.stage.height - 32);
   }
 }
 
