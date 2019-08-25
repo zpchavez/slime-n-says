@@ -49,14 +49,20 @@ class Keyboard
     this.totalNotes = 0;
     this.correctNotes = 0;
     this.previousCorrectNotes = 0;
+    this.level = 1;
+    this.subLevel = 1;
+    this.showMenu();
+    this.resetScore();
+  }
+
+  resetScore() {
     this.score = {
       [HAPPY]: 0,
       [SAD]: 0,
       [ANGRY]: 0,
     };
-    this.level = 1;
-    this.subLevel = 1;
-    this.showMenu();
+    this.totalNotes = 0;
+    this.correctNotes = 0;
   }
 
   initMidi() {
@@ -117,6 +123,12 @@ class Keyboard
     this.slimes = [];
     this.started = false;
     this.selectedMode = SHOW_ALL_NOTES;
+    this.onWinScreen = false;
+    this.hud.setFooterText(' ');
+    this.resetScore();
+    this.resetSlimes();
+    this.showSlimes();
+    this.showMenu();
   }
 
   startRound() {
@@ -172,13 +184,14 @@ class Keyboard
   showWinScreen() {
     this.hud.setText('Winner!');
     this.endTime = new Date();
+    this.hideSlimes();
     const rate = (this.correctNotes / this.totalNotes) * 100;
     const time = (this.endTime.getTime() - this.startTime.getTime())/1000;
     const minutes = Math.floor(time / 60).toString();
     const seconds = (time % 60).toFixed(3);
     this.texts = this.textUtil.centeredTexts(
       [
-        rpad('Mode', 16) + 'Show all notes',
+        rpad('Mode', 16) + (this.selectedMode === SHOW_ALL_NOTES ? 'All notes' : 'First note'),
         rpad('Correct Notes', 16) + `${rate.toFixed(2)}%`,
         rpad('Time', 16) + `${lpad(minutes, 2, '0')}:${lpad(seconds, 6, '0')}`,
         lpad(' '.toString(), 16) + lpad(this.score[HAPPY].toString(), 3),
@@ -311,6 +324,18 @@ class Keyboard
   resetSlimes() {
     Object.keys(this.keys).forEach(key => {
       this.keys[key].slime.resetMood();
+    })
+  }
+
+  hideSlimes() {
+    Object.keys(this.keys).forEach(key => {
+      this.keys[key].slime.sprite.visible = false;
+    })
+  }
+
+  showSlimes() {
+    Object.keys(this.keys).forEach(key => {
+      this.keys[key].slime.sprite.visible = true;
     })
   }
 
