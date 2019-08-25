@@ -19,24 +19,24 @@ class WhiteKey extends AbstractKey
     return KEY_HEIGHT;
   }
 
-  getFillColor() {
+  getFill() {
     return colors.white;
   }
 
-  getStrokeColor() {
+  getStroke() {
     return colors.black;
   }
 
-  getKeyXPos(index) {
+  getKeyX(index) {
     return 2 + (KEY_WIDTH * index);
   }
 
-  getKeyYPos() {
+  getKeyY() {
     return 210;
   }
 
-  getLabelXPos() {
-    return this.sprite.x + 33;
+  getLabelX() {
+    return this.sprite.x + 42;
   }
 
   getTextColor() {

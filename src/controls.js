@@ -2,9 +2,7 @@ export default function getControls(g) {
   const keyboard = g.keyboard;
   return {
     up: keyboard(38),
-    left: keyboard(37),
     down: keyboard(40),
-    right: keyboard(39),
     confirm: keyboard(13), // enter
     C4: keyboard(65),
     ['C#4']: keyboard(87),
