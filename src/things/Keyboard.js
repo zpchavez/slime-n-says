@@ -3,7 +3,9 @@ import WhiteKey from './WhiteKey';
 import BlackKey from './BlackKey';
 import Synth, { PIANO, OUT_OF_TUNE_PIANO } from '../../lib/synth';
 import colors from '../colors';
-import { HAPPY, NEUTRAL, SAD, ANGRY } from './Slime'
+import TextUtil from '../text-util';
+import { lpad, rpad } from '../utils';
+import Slime, { HAPPY, SAD, ANGRY } from './Slime'
 
 const naturals = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 const sharps = ['C', 'D', 'F', 'G', 'A'];
@@ -35,11 +37,18 @@ class Keyboard
     this.initMidi();
     this.pauseUntilNotePlayed = false;
     this.lockedInput = true;
+    this.onWinScreen = false;
     this.started = false;
     this.repeated = false;
     this.hud = hud;
     this.totalNotes = 0;
     this.correctNotes = 0;
+    this.previousCorrectNotes = 0;
+    this.score = {
+      [HAPPY]: 0,
+      [SAD]: 0,
+      [ANGRY]: 0,
+    };
     this.level = 1;
     this.subLevel = 1;
   }
@@ -68,34 +77,51 @@ class Keyboard
 
   start() {
     this.started = true;
+    this.startTime = new Date();
     this.melodyLength = 2;
     this.startRound();
     this.hud.setFooterText('Level 1-1');
   }
 
+  reset() {
+    this.g.remove(this.texts);
+    this.g.remove(this.slimes.map(slime => slime.sprite));
+    this.texts = [];
+    this.slimes = [];
+    this.started = false;
+  }
+
   startRound() {
     this.hud.setText('Listen');
     this.resetSlimes();
+    this.previousCorrectNotes = this.correctNotes;
     this.generateMelody();
   }
 
   showResults() {
-    let totalScore = 0;
+    let roundScore = 0;
     this.lockedInput = true;
     Object.keys(this.keys).forEach(key => {
-      totalScore += this.keys[key].slime.mood;
+      roundScore += this.keys[key].slime.mood;
+      this.score[this.keys[key].slime.mood]++;
     });
-    if (totalScore === 0) {
-      this.hud.setText('Slimes are neutral');
-      this.melodyLength--; // set melody length back to what it was
-    } else if (totalScore > 0) {
-      this.hud.setText('Slimes are mostly happy')
+    if (this.correctNotes - this.previousCorrectNotes === this.melodyLength) {
+      this.hud.setText('Perfect!');
+    } else if (roundScore === 0) {
+      this.hud.setText('Acceptable');
+    } else if (roundScore > 0) {
+      this.hud.setText('Nice!')
     } else {
-      this.hud.setText('Slimes are upset', 'Press enter to start over');
+      const messages = [
+        `Slimes don't want to play anymore`,
+        `Slimes have lost the music in their hearts`,
+        `Slimes just remembered they have a thing`,
+      ]
+      this.hud.setText('Game Over', this.g.randomPick(messages));
       this.started = false;
     }
 
-    if (totalScore >= 0) {
+    if (roundScore >= 0) {
       if (this.subLevel === 8 && this.level === 3) {
         this.showWinScreen();
       } else {
@@ -104,7 +130,6 @@ class Keyboard
         } else {
           this.level++;
           this.subLevel = 1;
-          this.melodyLength = 2;
         }
 
         setTimeout(() => {
@@ -117,6 +142,39 @@ class Keyboard
 
   showWinScreen() {
     this.hud.setText('Winner!');
+    this.endTime = new Date();
+    const rate = (this.correctNotes / this.totalNotes) * 100;
+    const time = (this.endTime.getTime() - this.startTime.getTime())/1000;
+    const minutes = Math.floor(time / 60).toString();
+    const seconds = (time % 60).toFixed(3);
+    const textUtil = new TextUtil(this.g);
+    this.texts = textUtil.centeredTexts(
+      [
+        rpad('Mode', 16) + 'Show all notes',
+        rpad('Correct Notes', 16) + `${rate.toFixed(2)}%`,
+        rpad('Time', 16) + `${lpad(minutes, 2, '0')}:${lpad(seconds, 6, '0')}`,
+        lpad(' '.toString(), 16) + lpad(this.score[HAPPY].toString(), 3),
+        lpad(' '.toString(), 16) + lpad(this.score[SAD].toString(), 3),
+        lpad(' '.toString(), 16) + lpad(this.score[ANGRY].toString(), 3),
+      ],
+      18,
+      colors.black,
+      32,
+      24
+    );
+    this.slimes = [
+      new Slime(this.g),
+      new Slime(this.g),
+      new Slime(this.g)
+    ];
+    this.slimes[0].setMood(HAPPY);
+    this.slimes[1].setMood(SAD);
+    this.slimes[2].setMood(ANGRY);
+    for (let i = 0; i < 3; i++) {
+      this.slimes[i].sprite.y = this.texts[i+3].y;
+      this.slimes[i].sprite.x = this.texts[i+3].x + 12;
+    }
+    this.onWinScreen = true;
   }
 
   initControls() {
@@ -129,7 +187,9 @@ class Keyboard
     })
     this.controls.C5.press = () => this.playNoteAsPlayer('C', 5);
     this.controls.confirm.press = () => {
-      if (!this.started) {
+      if (this.onWinScreen) {
+        this.reset();
+      } else if (!this.started) {
         this.start();
       } else if (!this.repeated) {
         this.playMelody(this.melody.slice());
@@ -142,8 +202,12 @@ class Keyboard
     if (!this.lockedInput && this.melody.length === 0) {
       this.lockedInput = true;
       this.repeated = false;
-      this.melodyLength++;
       this.showResults();
+      if (this.subLevel === 1) {
+        this.melodyLength = 2;
+      } else {
+        this.melodyLength++;
+      }
       return true;
     }
     return false;
@@ -168,6 +232,7 @@ class Keyboard
         this.playNote(note, octave, colors.blue);
         this.melody.shift();
         key.onCorrectNote(this.endRoundIfMelodyOver.bind(this));
+        this.correctNotes++;
         this.hud.setText('Play');
       } else {
         if (key.slime.mood !== ANGRY) {
@@ -214,11 +279,11 @@ class Keyboard
         Major: [2, 2, 1, 2, 2, 2, 1],
         ['Jazz Minor']: [2, 1, 2, 2, 2, 2, 1],
         ['Harmonic Minor']: [2, 1, 2, 2, 1, 3, 1],
+        ['Double Harmonic']: [1, 3, 1, 2, 1, 3, 1],
       },
       3: {
         Diminished: [1, 2, 1, 2, 1, 2, 1, 2],
         Chromatic: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        ['Double Harmonic']: [1, 3, 1, 2, 1, 3, 1],
       }
     }
     const scales = scalesByLevel[this.level];

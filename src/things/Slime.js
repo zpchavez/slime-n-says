@@ -65,7 +65,9 @@ class Slime
     } else {
       this.sprite = this.g.sprite(image);
     }
-    this.parentSprite.putTop(this.sprite);
+    if (this.parentSprite) {
+      this.parentSprite.putTop(this.sprite);
+    }
     this.sprite.y -= 3;
     this.sprite.scaleX = 1.25;
     this.sprite.scaleY = 1.25;

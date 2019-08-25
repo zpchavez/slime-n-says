@@ -20,10 +20,13 @@ class Hud
       this.g.remove(this.text);
     }
     this.text = this.textUtil.centeredText(text, 24, '#000000', 0);
-    if (this.subText && this.subText.content !== subText) {
-      this.g.remove(this.subText);
-      this.subText = this.textUtil.centeredText(subText, 18, '#000000', 32);
+    if (this.subText && this.subText.content === subText) {
+      return;
     }
+    if (this.subText) {
+      this.g.remove(this.subText);
+    }
+    this.subText = this.textUtil.centeredText(subText, 18, '#000000', 32);
   }
 
   setFooterText(text) {
