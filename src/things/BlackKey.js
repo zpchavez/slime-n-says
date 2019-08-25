@@ -20,15 +20,15 @@ class BlackKey extends AbstractKey
     return KEY_HEIGHT;
   }
 
-  getFillColor() {
+  getFill() {
     return colors.black;
   }
 
-  getStrokeColor() {
+  getStroke() {
     return '#777777';
   }
 
-  getKeyXPos(index) {
+  getKeyX(index) {
     let x = 22 + (KEY_WIDTH + WHITE_KEY_WIDTH * index);
     if (index > 1) {
       x += WHITE_KEY_WIDTH;
@@ -36,12 +36,12 @@ class BlackKey extends AbstractKey
     return x;
   }
 
-  getKeyYPos() {
+  getKeyY() {
     return 210;
   }
 
-  getLabelXPos() {
-    return this.sprite.x + 15;
+  getLabelX() {
+    return this.sprite.x + 19;
   }
 
   getTextColor() {

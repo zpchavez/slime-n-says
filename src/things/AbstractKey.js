@@ -12,12 +12,12 @@ class Key
   /**
    * Abstracts
    *
-   * getFillColor() {}
-   * getStrokeColor() {}
-   * getKeyXPos(index) {}
-   * getKeyYPos() {}
-   * getLabelXPos(index) {}
-   * getLabelYPos() {}
+   * getFill() {}
+   * getStroke() {}
+   * getKeyX(index) {}
+   * getKeyY() {}
+   * getLabelX(index) {}
+   * getLabelY() {}
    * getTextColor() {}
    * getWidth() {}
    * getHeight() {}
@@ -36,7 +36,7 @@ class Key
     });
   }
 
-  getLabelYPos() {
+  getLabelY() {
     return this.sprite.y + this.getHeight() - 20;
   }
 
@@ -45,19 +45,19 @@ class Key
     this.sprite = this.g.rectangle(
       this.getWidth(),
       this.getHeight(),
-      this.getFillColor(),
-      this.getStrokeColor(),
+      this.getFill(),
+      this.getStroke(),
       2
     );
-    this.sprite.x = this.getKeyXPos(index);
-    this.sprite.y = this.getKeyYPos();
+    this.sprite.x = this.getKeyX(index);
+    this.sprite.y = this.getKeyY();
 
     this.g.text(
       controlKey,
       '16px monospace',
       this.getTextColor(),
-      this.getLabelXPos(),
-      this.getLabelYPos()
+      this.getLabelX(),
+      this.getLabelY()
     );
   }
 
@@ -74,7 +74,7 @@ class Key
 
   update() {
     if (this.highlightFrames === 0) {
-      this.sprite.fillStyle = this.getFillColor();
+      this.sprite.fillStyle = this.getFill();
       this.highlightFrames = null;
     } else if (this.highlightFrames) {
       this.highlightFrames -= 1;

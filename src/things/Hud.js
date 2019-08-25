@@ -1,4 +1,5 @@
 import TextUtil from '../text-util';
+import colors from '../colors';
 
 class Hud
 {
@@ -19,14 +20,14 @@ class Hud
     if (this.text) {
       this.g.remove(this.text);
     }
-    this.text = this.textUtil.centeredText(text, 24, '#000000', 0);
+    this.text = this.textUtil.centeredText(text, 24, colors.black, 0);
     if (this.subText && this.subText.content === subText) {
       return;
     }
     if (this.subText) {
       this.g.remove(this.subText);
     }
-    this.subText = this.textUtil.centeredText(subText, 18, '#000000', 32);
+    this.subText = this.textUtil.centeredText(subText, 18, colors.black, 32);
   }
 
   setFooterText(text) {
@@ -36,7 +37,7 @@ class Hud
     if (this.footerText) {
       this.g.remove(this.footerText);
     }
-    this.footerText = this.textUtil.centeredText(text, 18, '#000000', this.g.stage.height - 32);
+    this.footerText = this.textUtil.centeredText(text, 18, colors.black, this.g.stage.height - 32);
   }
 }
 

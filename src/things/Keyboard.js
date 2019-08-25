@@ -9,28 +9,13 @@ import Slime, { HAPPY, SAD, ANGRY } from './Slime'
 
 const SHOW_ALL_NOTES = 0;
 const SHOW_FIRST_NOTE = 1;
-const modes = [SHOW_ALL_NOTES, SHOW_FIRST_NOTE];
 
-const naturals = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-const sharps = ['C', 'D', 'F', 'G', 'A'];
 const notes = [
   'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5'
 ];
-const controlMap = {
-  C4: 'A',
-  ['C#4']: 'W',
-  D4: 'S',
-  ['D#4']: 'E',
-  E4: 'D',
-  F4: 'F',
-  ['F#4']: 'T',
-  G4: 'G',
-  ['G#4']: 'Y',
-  A4: 'H',
-  ['A#4']: 'U',
-  B4: 'J',
-  C5: 'K'
-};
+const controls = ['A', 'W', 'S', 'E', 'D', 'F', 'T', 'G', 'Y', 'H', 'U', 'J', 'K'];
+const controlMap = {};
+notes.forEach((note, index) => controlMap[note] = controls[index]);
 
 class Keyboard
 {
@@ -40,7 +25,7 @@ class Keyboard
     this.initControls();
     this.createKeys();
     this.initMidi();
-    this.pauseUntilNotePlayed = false;
+    this.waitForNote = false;
     this.lockedInput = false;
     this.onWinScreen = false;
     this.started = false;
@@ -48,7 +33,7 @@ class Keyboard
     this.hud = hud;
     this.totalNotes = 0;
     this.correctNotes = 0;
-    this.previousCorrectNotes = 0;
+    this.prevCorrectNotes = 0;
     this.level = 1;
     this.subLevel = 1;
     this.showMenu();
@@ -134,7 +119,7 @@ class Keyboard
   startRound() {
     this.hud.setText('Listen');
     this.resetSlimes();
-    this.previousCorrectNotes = this.correctNotes;
+    this.prevCorrectNotes = this.correctNotes;
     this.generateMelody();
   }
 
@@ -145,7 +130,7 @@ class Keyboard
       roundScore += this.keys[key].slime.mood;
       this.score[this.keys[key].slime.mood]++;
     });
-    if (this.correctNotes - this.previousCorrectNotes === this.melodyLength) {
+    if (this.correctNotes - this.prevCorrectNotes === this.melodyLength) {
       this.hud.setText('Perfect!');
     } else if (roundScore === 0) {
       this.hud.setText('Acceptable');
@@ -235,12 +220,9 @@ class Keyboard
 
   initControls() {
     this.controls = getControls(this.g);
-    naturals.forEach(note => {
-      this.controls[`${note}4`].press = () => this.playNoteAsPlayer(note, 4);
-      if (sharps.indexOf(note) > -1) {
-        this.controls[`${note}#4`].press = () => this.playNoteAsPlayer(`${note}#`, 4);
-      }
-    })
+    notes.forEach(note => {
+      this.controls[note].press = () => this.playNoteAsPlayer(note.replace('4', ''), note.charAt(note.length - 1));
+    });
     this.controls.C5.press = () => this.playNoteAsPlayer('C', 5);
     this.controls.confirm.press = () => {
       if (this.onWinScreen) {
@@ -276,12 +258,12 @@ class Keyboard
       return;
     }
 
-    if (this.pauseUntilNotePlayed) {
-      if (this.pauseUntilNotePlayed !== `${note}${octave}`) {
+    if (this.waitForNote) {
+      if (this.waitForNote !== `${note}${octave}`) {
         return;
       }
       this.playNote(note, octave, colors.blue);
-      this.pauseUntilNotePlayed = false;
+      this.waitForNote = false;
       this.melody.shift();
       this.endRoundIfMelodyOver() || this.hud.setText('Continue');
     } else if (this.melody && this.melody.length) {
@@ -294,7 +276,7 @@ class Keyboard
         this.hud.setText('Play');
       } else {
         if (key.slime.mood !== ANGRY) {
-          this.pauseUntilNotePlayed = this.melody[0];
+          this.waitForNote = this.melody[0];
           this.playNote(note, octave, colors.red, OUT_OF_TUNE_PIANO);
 
           // Show what correct note was
@@ -309,7 +291,7 @@ class Keyboard
           this.hud.setText('Slime is angry', 'Play another key');
         }
       }
-    } else if (!this.pauseUntilNotePlayed) {
+    } else if (!this.waitForNote) {
       this.playNote(note, octave, colors.blue);
     }
   }
@@ -321,22 +303,22 @@ class Keyboard
     }
   }
 
-  resetSlimes() {
+  updateSlimes(callback) {
     Object.keys(this.keys).forEach(key => {
-      this.keys[key].slime.resetMood();
-    })
+      callback(this.keys[key].slime);
+    });
+  }
+
+  resetSlimes() {
+    this.updateSlimes(slime => slime.resetMood());
   }
 
   hideSlimes() {
-    Object.keys(this.keys).forEach(key => {
-      this.keys[key].slime.sprite.visible = false;
-    })
+    this.updateSlimes(slime => slime.sprite.visible = false);
   }
 
   showSlimes() {
-    Object.keys(this.keys).forEach(key => {
-      this.keys[key].slime.sprite.visible = true;
-    })
+    this.updateSlimes(slime => slime.sprite.visible = true);
   }
 
   generateMelody() {
@@ -478,13 +460,10 @@ class Keyboard
   createKeys() {
     this.keys = {};
 
-    naturals.forEach((n, i) => {
-      const note = `${n}4`
+    notes.filter(note => note.length == 2).forEach((note, i) => {
       this.keys[note] = new WhiteKey(this.g, i, controlMap[note]);
     })
-    this.keys[`C5`] = new WhiteKey(this.g, 7, controlMap['C5']);
-    sharps.forEach((n, i) => {
-      const note = `${n}#4`;
+    notes.filter(note => note.length === 3).forEach((note, i) => {
       this.keys[note] = new BlackKey(this.g, i, controlMap[note]);
     })
   }

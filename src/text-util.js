@@ -3,24 +3,6 @@ class TextUtil {
     this.g = g;
   }
 
-  // clear() {
-  //   this.g.remove(this.texts);
-  // }
-
-  // createText(string, size, color, x, y) {
-  //   const text = this.g.text(
-  //     string,
-  //     `${size}px monospace`,
-  //     color,
-  //     x,
-  //     y
-  //   );
-
-  //   this.texts.push(text);
-
-  //   return text;
-  // }
-
   centeredTexts(strings, size, color, y, spacing) {
     const g = this.g;
     const letterSpacing = size * 0.2;
@@ -37,8 +19,6 @@ class TextUtil {
         y + (spacing * index)
       )
     );
-
-    // this.texts.push.apply(this.texts, texts);
 
     return texts;
   }
