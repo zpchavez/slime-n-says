@@ -1,5 +1,3 @@
-import { scale } from '../config';
-
 export const HAPPY = 1;
 export const NEUTRAL = 0;
 export const SAD = -1;

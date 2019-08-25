@@ -53,6 +53,7 @@ class Keyboard
 
   showResults() {
     let totalScore = 0;
+    this.lockedInput = true;
     Object.keys(this.keys).forEach(key => {
       totalScore += this.keys[key].slime.mood;
     });
@@ -91,7 +92,7 @@ class Keyboard
   }
 
   endRoundIfMelodyOver() {
-    if (this.melody.length === 0) {
+    if (!this.lockedInput && this.melody.length === 0) {
       this.lockedInput = true;
       this.repeated = false;
       this.melodyLength++;
