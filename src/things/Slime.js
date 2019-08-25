@@ -1,4 +1,4 @@
-import colors from '../colors';
+import { scale } from '../config';
 
 export const HAPPY = 1;
 export const NEUTRAL = 0;
@@ -68,6 +68,9 @@ class Slime
       this.sprite = this.g.sprite(image);
     }
     this.parentSprite.putTop(this.sprite);
+    this.sprite.y -= 3;
+    this.sprite.scaleX = 1.25;
+    this.sprite.scaleY = 1.25;
   }
 
   jump(onDoneJumping) {

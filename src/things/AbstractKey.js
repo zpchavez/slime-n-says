@@ -67,7 +67,6 @@ class Key
 
   initSlime() {
     this.slime = new Slime(this.g, this.sprite);
-    this.slime.sprite.y--;
   }
 
   highlight(color, time) {
