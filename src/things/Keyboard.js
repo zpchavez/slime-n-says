@@ -325,13 +325,14 @@ class Keyboard
     const scalesByLevel = {
       1: {
         Pentatonic: [2, 2, 3, 2],
-        ['Whole Tone']: [2, 2, 2, 2, 2, 2],
+        ['Whole Tone']: [2, 2, 2, 2, 2],
+        ['Blues']: [3, 2, 1, 1, 3, 2],
       },
       2: {
         Major: [2, 2, 1, 2, 2, 2, 1],
         ['Jazz Minor']: [2, 1, 2, 2, 2, 2, 1],
         ['Harmonic Minor']: [2, 1, 2, 2, 1, 3, 1],
-        ['Double Harmonic']: [1, 3, 1, 2, 1, 3, 1],
+        // ['Double Harmonic']: [1, 3, 1, 2, 1, 3, 1],
       },
       3: {
         Diminished: [1, 2, 1, 2, 1, 2, 1, 2],
