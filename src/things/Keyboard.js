@@ -28,6 +28,7 @@ class Keyboard
     this.waitForNote = false;
     this.lockedInput = false;
     this.onWinScreen = false;
+    this.gameOver = false;
     this.started = false;
     this.repeated = false;
     this.hud = hud;
@@ -102,13 +103,20 @@ class Keyboard
   }
 
   reset() {
-    this.g.remove(this.texts);
-    this.g.remove(this.slimes.map(slime => slime.sprite));
+    if (this.texts) {
+      this.g.remove(this.texts);
+    }
+    if (this.winScreenSlimes) {
+      this.g.remove(this.winScreenSlimes.map(slime => slime.sprite));
+    }
     this.texts = [];
-    this.slimes = [];
+    this.winScreenSlimes = [];
     this.started = false;
     this.selectedMode = SHOW_ALL_NOTES;
     this.onWinScreen = false;
+    this.gameOver = false;
+    this.level = 1;
+    this.subLevel = 1;
     this.hud.setFooterText(' ');
     this.resetScore();
     this.resetSlimes();
@@ -144,7 +152,7 @@ class Keyboard
         `Slimes are kicking you out of the band`,
       ]
       this.hud.setText('Game Over', this.g.randomPick(messages));
-      this.started = false;
+      this.gameOver = true;
     }
 
     if (roundScore >= 0) {
@@ -188,17 +196,17 @@ class Keyboard
       32,
       24
     );
-    this.slimes = [
+    this.winScreenSlimes = [
       new Slime(this.g),
       new Slime(this.g),
       new Slime(this.g)
     ];
-    this.slimes[0].setMood(HAPPY);
-    this.slimes[1].setMood(SAD);
-    this.slimes[2].setMood(ANGRY);
+    this.winScreenSlimes[0].setMood(HAPPY);
+    this.winScreenSlimes[1].setMood(SAD);
+    this.winScreenSlimes[2].setMood(ANGRY);
     for (let i = 0; i < 3; i++) {
-      this.slimes[i].sprite.y = this.texts[i+3].y;
-      this.slimes[i].sprite.x = this.texts[i+3].x + 12;
+      this.winScreenSlimes[i].sprite.y = this.texts[i+3].y;
+      this.winScreenSlimes[i].sprite.x = this.texts[i+3].x + 12;
     }
     this.onWinScreen = true;
   }
@@ -225,7 +233,7 @@ class Keyboard
     });
     this.controls.C5.press = () => this.playNoteAsPlayer('C', 5);
     this.controls.confirm.press = () => {
-      if (this.onWinScreen) {
+      if (this.onWinScreen || this.gameOver) {
         this.reset();
       } else if (!this.started) {
         this.start();
