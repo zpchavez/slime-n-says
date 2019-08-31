@@ -52,7 +52,7 @@ class Key
     this.sprite.x = this.getKeyX(index);
     this.sprite.y = this.getKeyY();
 
-    this.g.text(
+    this.text = this.g.text(
       controlKey,
       '16px monospace',
       this.getTextColor(),
