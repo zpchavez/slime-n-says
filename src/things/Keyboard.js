@@ -7,8 +7,14 @@ import TextUtil from '../text-util';
 import { lpad, rpad } from '../utils';
 import Slime, { HAPPY, SAD, ANGRY } from './Slime'
 
+const WHITE_KEYS = 0;
+const ALL_KEYS = 1;
+
 const SHOW_ALL_NOTES = 0;
 const SHOW_FIRST_NOTE = 1;
+
+const KEY_MODE = 0;
+const HIGHLIGHT_MODE = 1;
 
 const notes = [
   'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5'
@@ -29,6 +35,7 @@ class Keyboard
     this.lockedInput = false;
     this.onWinScreen = false;
     this.gameOver = false;
+    this.menuStep = KEY_MODE;
     this.started = false;
     this.repeated = false;
     this.hud = hud;
@@ -77,8 +84,8 @@ class Keyboard
     this.hud.setText('Select Mode');
     this.menuTexts = this.textUtil.centeredTexts(
       [
-        'Show All Notes  (Easier)',
-        'Show First Note (Harder)',
+        'White Keys (Easier)',
+        'All Keys   (Harder)',
       ],
       18,
       colors.black,
@@ -89,7 +96,25 @@ class Keyboard
     this.cursor.setMood(HAPPY);
     this.cursor.sprite.y = this.menuTexts[0].y;
     this.cursor.sprite.x = this.menuTexts[0].x - 24;
-    this.selectedMode = SHOW_ALL_NOTES;
+    this.keyMode = WHITE_KEYS;
+    this.highlightMode = SHOW_ALL_NOTES;
+  }
+
+  showMenuStep2() {
+    this.menuStep = HIGHLIGHT_MODE;
+    this.g.remove(this.menuTexts);
+    this.menuTexts = this.textUtil.centeredTexts(
+      [
+        'Show All Notes  (Easier)',
+        'Show First Note (Harder)',
+      ],
+      18,
+      colors.black,
+      40,
+      32,
+    );
+    this.cursor.sprite.y = this.menuTexts[0].y;
+    this.cursor.sprite.x = this.menuTexts[0].x - 24;
   }
 
   start() {
@@ -112,7 +137,8 @@ class Keyboard
     this.texts = [];
     this.winScreenSlimes = [];
     this.started = false;
-    this.selectedMode = SHOW_ALL_NOTES;
+    this.menuStep = KEY_MODE;
+    this.highlightMode = SHOW_ALL_NOTES;
     this.onWinScreen = false;
     this.gameOver = false;
     this.level = 1;
@@ -121,6 +147,7 @@ class Keyboard
     this.resetScore();
     this.resetSlimes();
     this.showSlimes();
+    this.showKeyboard();
     this.showMenu();
   }
 
@@ -146,17 +173,22 @@ class Keyboard
       this.hud.setText('Nice!')
     } else {
       const messages = [
-        `Slimes don't want to play anymore`,
-        `Slimes have lost the music in their hearts`,
-        `Slimes just remembered they have a thing`,
-        `Slimes are kicking you out of the band`,
+        `The slimes don't want to play anymore`,
+        `The slimes have lost the music in their hearts`,
+        `The slimes just remembered they have a thing`,
+        `The slimes are kicking you out of the band`,
       ]
       this.hud.setText('Game Over', this.g.randomPick(messages));
       this.gameOver = true;
     }
 
     if (roundScore >= 0) {
-      if (this.subLevel === 8 && this.level === 3) {
+      if (
+        this.subLevel === 8 &&
+        this.level === (
+          this.keyMode === WHITE_KEYS ? 2 : 3
+        )
+      ) {
         this.showWinScreen();
       } else {
         if (this.subLevel < 8) {
@@ -175,16 +207,26 @@ class Keyboard
   }
 
   showWinScreen() {
-    this.hud.setText('Winner!');
+    if (this.keyMode === WHITE_KEYS) {
+      this.hud.setText('Well Done!', 'Try all keys mode to proceed to level 3')
+    } else {
+      this.hud.setText('You Win!');
+    }
     this.endTime = new Date();
     this.hideSlimes();
+    this.hideKeyboard();
     const rate = (this.correctNotes / this.totalNotes) * 100;
     const time = (this.endTime.getTime() - this.startTime.getTime())/1000;
     const minutes = Math.floor(time / 60).toString();
     const seconds = (time % 60).toFixed(3);
+    const modeText = (
+      (this.keyMode === WHITE_KEYS ? 'White Keys | ' : 'All Keys | ') +
+      (this.highlightMode === SHOW_ALL_NOTES ? 'Show All' : 'Show First')
+    );
     this.texts = this.textUtil.centeredTexts(
       [
-        rpad('Mode', 16) + (this.selectedMode === SHOW_ALL_NOTES ? 'All notes' : 'First note'),
+        ' ',
+        rpad('Mode', 16) + modeText,
         rpad('Correct Notes', 16) + `${rate.toFixed(2)}%`,
         rpad('Time', 16) + `${lpad(minutes, 2, '0')}:${lpad(seconds, 6, '0')}`,
         lpad(' '.toString(), 16) + lpad(this.score[HAPPY].toString(), 3),
@@ -193,8 +235,8 @@ class Keyboard
       ],
       18,
       colors.black,
-      32,
-      24
+      50,
+      50
     );
     this.winScreenSlimes = [
       new Slime(this.g),
@@ -205,8 +247,8 @@ class Keyboard
     this.winScreenSlimes[1].setMood(SAD);
     this.winScreenSlimes[2].setMood(ANGRY);
     for (let i = 0; i < 3; i++) {
-      this.winScreenSlimes[i].sprite.y = this.texts[i+3].y;
-      this.winScreenSlimes[i].sprite.x = this.texts[i+3].x + 12;
+      this.winScreenSlimes[i].sprite.y = this.texts[i+4].y;
+      this.winScreenSlimes[i].sprite.x = this.texts[i+4].x + 12;
     }
     this.onWinScreen = true;
   }
@@ -216,14 +258,25 @@ class Keyboard
       return;
     }
 
-    if (this.selectedMode === SHOW_ALL_NOTES) {
-      this.selectedMode = SHOW_FIRST_NOTE;
+    let mode;
+    if (this.menuStep === KEY_MODE) {
+      if (this.keyMode === ALL_KEYS) {
+        this.keyMode = WHITE_KEYS;
+      } else {
+        this.keyMode = ALL_KEYS;
+      }
+      mode = this.keyMode;
     } else {
-      this.selectedMode = SHOW_ALL_NOTES;
+      if (this.highlightMode === SHOW_ALL_NOTES) {
+        this.highlightMode = SHOW_FIRST_NOTE;
+      } else {
+        this.highlightMode = SHOW_ALL_NOTES;
+      }
+      mode = this.highlightMode;
     }
 
-    this.cursor.sprite.x = this.menuTexts[this.selectedMode].x - 24;
-    this.cursor.sprite.y = this.menuTexts[this.selectedMode].y;
+    this.cursor.sprite.x = this.menuTexts[mode].x - 24;
+    this.cursor.sprite.y = this.menuTexts[mode].y;
   }
 
   initControls() {
@@ -236,7 +289,11 @@ class Keyboard
       if (this.onWinScreen || this.gameOver) {
         this.reset();
       } else if (!this.started) {
-        this.start();
+        if (this.menuStep === 0) {
+          this.showMenuStep2();
+        } else {
+          this.start();
+        }
       } else if (!this.repeated) {
         this.playMelody(this.melody.slice());
         this.repeated = true;
@@ -329,6 +386,20 @@ class Keyboard
     this.updateSlimes(slime => slime.sprite.visible = true);
   }
 
+  hideKeyboard() {
+    Object.keys(this.keys).forEach(key => {
+      this.keys[key].sprite.visible = false;
+      this.keys[key].text.visible = false;
+    });
+  }
+
+  showKeyboard() {
+    Object.keys(this.keys).forEach(key => {
+      this.keys[key].sprite.visible = true;
+      this.keys[key].text.visible = true;
+    });
+  }
+
   generateMelody() {
     const scalesByLevel = {
       1: {
@@ -340,17 +411,26 @@ class Keyboard
         Major: [2, 2, 1, 2, 2, 2, 1],
         ['Jazz Minor']: [2, 1, 2, 2, 2, 2, 1],
         ['Harmonic Minor']: [2, 1, 2, 2, 1, 3, 1],
-        // ['Double Harmonic']: [1, 3, 1, 2, 1, 3, 1],
       },
       3: {
         Diminished: [1, 2, 1, 2, 1, 2, 1, 2],
         Chromatic: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       }
     }
+    const whiteKeyModeOptions = {
+      1: {
+        scale: 'Pentatonic',
+        keys: ['C', 'F', 'G'],
+      },
+      2: {
+        scale: 'Major',
+        keys: 'C',
+      }
+    };
     const scales = scalesByLevel[this.level];
-    const scaleName = this.g.randomPick(
-      Object.keys(scales)
-    );
+    const scaleName = this.keyMode === WHITE_KEYS
+      ? whiteKeyModeOptions[this.level].scale
+      : this.g.randomPick(Object.keys(scales));
     const scale = scales[scaleName];
 
     const getNoteIndices = (startingIndex) => {
@@ -373,7 +453,9 @@ class Keyboard
       if (note === 'C5') return;
       keyCenters[note.replace('4', '')] = getNoteIndices(i);
     })
-    const randomKey = this.g.randomPick(Object.keys(keyCenters));
+    const randomKey = this.keyMode === WHITE_KEYS
+      ? this.g.randomPick(whiteKeyModeOptions[this.level].keys)
+      : this.g.randomPick(Object.keys(keyCenters));
     const diatonicIndices = keyCenters[randomKey];
     const diatonicNotes = notes.filter((n, i) => diatonicIndices.indexOf(i) > -1);
 
@@ -438,7 +520,7 @@ class Keyboard
     if (melody.length) {
       const isFirstNote = melody.length === this.melodyLength;
       const noteAndOctave = melody.shift();
-      if (this.selectedMode === SHOW_ALL_NOTES || isFirstNote) {
+      if (this.highlightMode === SHOW_ALL_NOTES || isFirstNote) {
         this.keys[noteAndOctave].slime.jump();
       }
       const octave = noteAndOctave.charAt(noteAndOctave.length - 1);
@@ -446,7 +528,7 @@ class Keyboard
       this.playNote(
         note,
         octave,
-        this.selectedMode === SHOW_FIRST_NOTE && !isFirstNote
+        this.highlightMode === SHOW_FIRST_NOTE && !isFirstNote
           ? null
           : colors.lightBlue
       );
