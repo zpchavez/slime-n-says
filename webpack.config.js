@@ -43,7 +43,9 @@ if (environment === 'development') {
     new WebpackError(process.platform)
   );
 } else if (environment === 'production') {
-  if (process.env.MINIFIER === 'uglify') {
+  if (process.env.MINIFIER === 'none') {
+    // no-op
+  } else if (process.env.MINIFIER === 'uglify') {
     config.plugins.push(
       new UglifyJSPlugin({
         // uglifyOptions: {
