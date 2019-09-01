@@ -8,3 +8,5 @@ training but _slightly_ more game-like.
 Synthesizer code adapted from: https://github.com/keithwhor/audiosynth
 
 Built on the [Ga](https://github.com/kittykatattack/ga) game engine.
+
+GitHub corner link from: https://github.com/tholman/github-corners
