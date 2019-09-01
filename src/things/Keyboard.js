@@ -212,6 +212,7 @@ class Keyboard
     } else {
       this.hud.setText('You Win!');
     }
+    this.hud.setFooterText(' ');
     this.endTime = new Date();
     this.hideSlimes();
     this.hideKeyboard();
