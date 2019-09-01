@@ -27,7 +27,7 @@ class Hud
     if (this.subText) {
       this.g.remove(this.subText);
     }
-    this.subText = this.textUtil.centeredText(subText, 18, colors.black, 32);
+    this.subText = this.textUtil.centeredText(subText, 18, colors.black, 42);
   }
 
   setFooterText(text) {
