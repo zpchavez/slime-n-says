@@ -5,7 +5,9 @@
   "scripts": {
     "start": "node dev-server.js",
     "build-closure": "rm -rf ./build; APP_ENV=production MINIFIER=closure ./node_modules/.bin/webpack",
-    "build-uglify": "rm -rf ./build; APP_ENV=production MINIFIER=uglify ./node_modules/.bin/webpack"
+    "build-uglify": "rm -rf ./build; APP_ENV=production MINIFIER=uglify ./node_modules/.bin/webpack",
+    "build-no-minify": "rm -rf ./build; APP_ENV=production MINIFIER=none ./node_modules/.bin/webpack",
+    "build-rollup-terser": "npm run build-no-minify; npx rollup ./src/main.js --file bundle.js --format esm; npx terser bundle.js --compress --mangle > ./build/app.js; rm bundle.js"
   },
   "dependencies": {
     "babel-core": "^6.18.2",
@@ -17,6 +19,7 @@
     "html-webpack-plugin": "^2.24.1",
     "query-string": "^4.2.3",
     "request": "^2.76.0",
+    "rollup": "^1.20.2",
     "uglifyjs-webpack-plugin": "^1.3.0",
     "webpack": "^1.13.3",
     "webpack-closure-compiler": "^2.1.5",

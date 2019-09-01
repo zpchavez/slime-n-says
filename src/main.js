@@ -1,10 +1,8 @@
-require('../lib/ga.js');
-require('../lib/custom.js');
+import ga from '../lib/ga.js';
+import '../lib/custom.js';
 
 import gameState from './states/game';
 import { scale } from './config'
-
-const ga = window.ga;
 
 var g = ga(
   644 * scale,
