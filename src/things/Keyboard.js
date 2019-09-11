@@ -98,6 +98,7 @@ class Keyboard
     this.cursor.sprite.x = this.menuTexts[0].x - 24;
     this.keyMode = WHITE_KEYS;
     this.highlightMode = SHOW_ALL_NOTES;
+    this.hud.setFooterText('Select mode with arrows keys and press Enter')
   }
 
   showMenuStep2() {
@@ -179,6 +180,7 @@ class Keyboard
         `The slimes are kicking you out of the band`,
       ]
       this.hud.setText('Game Over', this.g.randomPick(messages));
+      this.hud.setFooterText('Press Enter to restart');
       this.gameOver = true;
     }
 
@@ -212,7 +214,7 @@ class Keyboard
     } else {
       this.hud.setText('You Win!');
     }
-    this.hud.setFooterText(' ');
+    this.hud.setFooterText('Press Enter to restart');
     this.endTime = new Date();
     this.hideSlimes();
     this.hideKeyboard();
