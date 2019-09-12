@@ -3,6 +3,8 @@
 A melody game about musical slime creatures. It's like ear
 training but _slightly_ more game-like.
 
+Play it [here](https://zpchavez.github.io/slime-n-says).
+
 #### Credits
 
 Synthesizer code adapted from: https://github.com/keithwhor/audiosynth
