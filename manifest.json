@@ -1,14 +1,9 @@
 {
-  "name": "Title of the game",
-  "description": "Description of the game, including controls and optional extras for Coil subscribers if you participate in the Web Monetization category.",
+  "name": "Slime'n Says",
+  "description": "Slimes will play a melody. Play it back correctly to make them happy.",
   "images" : {
-    "image_large": "image-big.jpg",
-    "image_thumbnail": "image-small.jpg"
+    "image_large": "screenshot.png",
+    "image_thumbnail": "thumbnail.png"
   },
-  "categories": ["Desktop", "Mobile", "Server", "Web Monetization", "WebXR"],
-  "user" : {
-    "name": "optional",
-    "website": "optional",
-    "twitter": "optional"
-  }
+  "categories": ["Desktop"]
 }
